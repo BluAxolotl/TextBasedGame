@@ -3,23 +3,54 @@ Scenes["start"] = () => {
 		title: "Beginning",
 	})
 
-	let local_box = new Entity(`[DENVER POLICE STATION TERMINAL] {term1}<br>><input id="enter"></input>`)
+	let local_box = new Entity(`[DENVER POLICE STATION TERMINAL] {term1}<span id="cmdout"></span><br>><input id="enter"></input>`)
 	local_box.styles[1] = 'border-style: double;  width: 600px; height: 200px;'
-	local_box.update = frame => {
+
+	onKey(13, () => {
 		let input = document.getElementById('enter')
-	}
-	document.onkeydown = e => {
-		if (e.which == 13 && document.activeElement == local_box.element) {
-			switch (input.value) {
-				case 'TEST':
-					switchScene("mid")
-				break;
-				case 'SINE':
-					local_box.styles[1] = `border-style: double;  width: 600px; height: 200px;`
-				break;
+		if (input == document.activeElement) {
+			let cmd_out = document.getElementById('cmdout')
+			let lines = cmd_out.innerHTML.split("<br>")
+			let cPrint = (stuff) => {
+				if (lines.length >= 11) {
+					print(lines.length)
+					let del_line = lines.shift()
+					lines[0] = ""
+					cmd_out.innerHTML = lines.join("<br>")
+				}
+				cmd_out.innerHTML += ('<br>'+stuff)
 			}
+			let args = input.value.split(" ")
+			let cmd = args.shift()
+			switch (cmd) {
+				case 'TEST':
+					cPrint("Loadings...")
+					setTimeout(() => {switchScene("mid")}, 2000)
+				break;
+				case 'HELP':
+					cPrint("Nope, you get no help...")
+				break;
+				case ('FUNC' || 'SINE'):
+					if (local_box.shrink == null) { local_box.shrink = false }
+					if (!local_box.shrink) {
+						easeFunc(1000, 'ball', int => {
+							let amp = -100
+							local_box.styles[1] = `border-style: double;  width: ${600+(int*amp)}px; height: ${200+(int*amp)}px;`
+						})
+					} else {
+						easeFunc(500, 'back', int => {
+							let amp = 100
+							local_box.styles[1] = `border-style: double;  width: ${500+(int*amp)}px; height: ${100+(int*amp)}px;`
+						})
+					}
+					local_box.shrink = (!local_box.shrink)
+				break;
+				default:
+					cPrint(`Invalid Command '${cmd}'`)
+			}
+			input.value = ""
 		}
-	}
+	})
 
 	// GlobalVars.guide = new Entity('Initializing...<br><br>Denver Police Station Terminal 1992-2022 ©<br>> <input placeholder="..." style="width: 260px;"></input>'.toUpperCase())
 	// GlobalVars.guide.x = 10

@@ -49,12 +49,64 @@ class Entity {
 	}
 }
 
-function sinFunc(float) {
-	return Math.sin(Math.PI(float)/2)
+/*
+	BEST WEBSITE A BILLION YEARS
+	-> https://easings.net/
+*/
+
+function easeOutBounce(x) {
+	const n1 = 7.5625;
+	const d1 = 2.75;
+
+	if (x < 1 / d1) {
+	    return n1 * x * x;
+	} else if (x < 2 / d1) {
+	    return n1 * (x -= 1.5 / d1) * x + 0.75;
+	} else if (x < 2.5 / d1) {
+	    return n1 * (x -= 2.25 / d1) * x + 0.9375;
+	} else {
+	    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+	}
 }
 
-function expFunc(float, pow = 2) {
-	return float**pow
+function easeInOutBack(x) {
+	const c1 = 1.70158;
+	const c2 = c1 * 1.525;
+
+	return x < 0.5
+	  ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+	  : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+}
+
+function easeOutElastic(x) {
+	const c4 = (2 * Math.PI) / 3;
+
+	return x === 0
+	  ? 0
+	  : x === 1
+	  ? 1
+	  : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+}
+
+const easeFuncs = {
+	sine: (x) => { return -(Math.cos((Math.PI*x))-1)/2 },
+	ball: easeOutBounce,
+	back: easeInOutBack,
+	expo: (x) => { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; },
+	elas: easeOutElastic,
+}
+
+function easeFunc(duration, type, func) {
+
+	let i = 0
+	let funcid = setInterval(() => {
+		let float = i/100
+		let int = easeFuncs[type](float)
+		func(int)
+		i++
+	}, Math.floor(duration/100))
+
+	return new Promise((res, rej) => { setTimeout(() => { clearInterval(funcid); res() }, duration) })
 }
 
 function repeat(amount, func) {
@@ -115,6 +167,37 @@ document.body.onmousemove = e => {
 	mouse_pos = [e.clientX, e.clientY]
 }
 
+var KeyDownTimer = {}
+var KeyListeners = {}
+
+document.onkeyup = e => {
+	KeyDownTimer[e.which] = 0
+}
+
+document.onkeydown = e => {
+	if (KeyDownTimer[e.which] == null) {
+		KeyDownTimer[e.which] = 1
+	} else {
+		KeyDownTimer[e.which]++
+	}
+
+	if (KeyDownTimer[e.which] == 1 && Array.isArray(KeyListeners[e.which])) {
+		KeyListeners[e.which].forEach(func => {
+			func()
+		})
+	}
+}
+
+function onKey(key, func) {
+	if (!Array.isArray(KeyListeners[key])) {
+		KeyListeners[key] = []
+	}
+
+	KeyListeners[key].push(func)
+
+	print(KeyListeners[key])
+}
+
 function setScene(object) {
 	document.title = `Chat Rooms - ${object.title}`
 }
@@ -123,11 +206,11 @@ var Scenes = {}
 var GlobalVars = {}
 const scene_names = ["start", "mid"]
 
-function wait(sec) {
+function wait(milisec) {
 	return new Promise((res, rej) => {
 		setTimeout(() => {
 			res()
-		}, (sec*1000))
+		}, (milisec))
 	})
 }
 

@@ -3,13 +3,14 @@ Scenes["mid"] = () => {
 		title: "Middle...",
 	})
 
-	repeat(10, async i => {
+	repeat(5, async i => {
 		// let local_box = new Entity(ui_box(DOUBLE_LINED, 21, 4, '*NEW OFFER: ACCEPT THIS BRAND NEW OFFER RIGHT NOW!!'))
-		await wait((i)/3)
-		let local_box = new Entity(`[DENVER POLICE STATION TERMINAL] {term${i+1}}<br>><input></input>`)
-		local_box.styles.push('border-style: double;  width: 350px; height: 45px;')
-		local_box.y = i*50
-		local_box.x = i*30
+		await wait(i*100)
+		let local_box = new Entity(ui_box(SINGLE_LINED, 6, 6, "NO WAY!"))
+		easeFunc(700, 'back', int => {
+			local_box.x = (i*100)*int
+			local_box.y = (i*100)*int
+		})
 	})
 
 	// GlobalVars.guide = new Entity('Initializing...<br><br>Denver Police Station Terminal 1992-2022 ©<br>> <input placeholder="..." style="width: 260px;"></input>'.toUpperCase())
