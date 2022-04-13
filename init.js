@@ -8,10 +8,12 @@ const HEAVY_LINED = ["┏", "┓", "┗", "┛", "━", "┃"]
 
 var mouse_pos = [0,0]
 
+var GlobalEntityHolder = []
+
 class Entity {
 	constructor(char = "*") {
 		this.element = document.createElement('p')
-		this.element.classList.add('entity')
+		this.element.classList.add('entity', 'loading')
 		this.element.innerHTML = char
 
 		this.styles = ["position: absolute;"]
@@ -28,13 +30,16 @@ class Entity {
 		this.element.onmouseenter = e => { if (this.hover_entity != null) {this.hover_entity.styles[0] = "position: absolute; pointer-events: none;"} }
 		this.element.onmouseleave = e => { if (this.hover_entity != null) {this.hover_entity.styles[0] = "position: absolute; pointer-events: none; display: none;"} }
 
-		container.appendChild(this.element)
-		setInterval(() => {
+		this.update_id = setInterval(() => {
 			this.position = [this.x,this.y]
 			this.element.style = `${this.styles.join(" ")} left: ${this.position[0]}px; top: ${this.position[1]}px; z-index: ${this.z};`
 			if (this.update != null) { this.update(this.lifetime) }
 			this.lifetime++
 		}, FRAMERATE)
+
+		GlobalEntityHolder.push(this)
+		container.appendChild(this.element)
+		setTimeout(() => {this.element.classList.remove('loading')}, 50)
 	}
 
 	setHover(entity) {
@@ -105,3 +110,36 @@ document.body.onmousemove = e => {
 function setScene(object) {
 	document.title = `Chat Rooms - ${object.title}`
 }
+
+var Scenes = {}
+var GlobalVars = {}
+const scene_names = ["start", "mid"]
+
+function wait(sec) {
+	return new Promise((res, rej) => {
+		setTimeout(() => {
+			res()
+		}, (sec*1000))
+	})
+}
+
+function switchScene(scene_name) {
+	print(Object.values(GlobalVars))
+	GlobalEntityHolder.forEach(entity => {
+		let event_properties = Object.values(entity.element).filter(i => i.startsWith("on"))
+		entity.element.onclick = null
+		if (!Object.values(GlobalVars).includes(entity)) {
+			clearInterval(entity.update_id)
+			entity.element.remove()
+		}
+	})
+	Scenes[scene_name]()
+}
+
+scene_names.forEach((script, i) => {
+	let script_elem = document.createElement('script')
+	script_elem.src = `scene_${script}.js`
+	document.body.appendChild(script_elem)
+})
+
+setTimeout(() => { switchScene("start") }, 20)

@@ -1,11 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Source+Code+Pro&display=swap');
+
+@font-face {
+  font-family: Retro;
+  src: url(./fonts/retro.ttf);
+}
+
 body {
   width: 90vw;
   height: 90vh;
-  background: #151515;
-  color: #FFFF00;
-  font-family: 'Roboto Mono', monospace;
+  background: #00177D;
+  color: #FFFFFF;
+  font-family: Retro, monospace;
+  font-weight: 10;
 }
 
 .entity {
 	margin: 0px;
+}
+
+.loading {
+  display: none !important;
+}
+
+input {
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+}
+
+textarea:focus, input:focus{
+    outline: none;
 }
