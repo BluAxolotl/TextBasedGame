@@ -4,11 +4,20 @@ Scenes["start"] = () => {
 	})
 
 	let local_box = new Entity(`[DENVER POLICE STATION TERMINAL] {term1}<br>><input id="enter"></input>`)
-	local_box.styles.push('border-style: double;  width: 600px; height: 200px;')
+	local_box.styles[1] = 'border-style: double;  width: 600px; height: 200px;'
 	local_box.update = frame => {
 		let input = document.getElementById('enter')
-		if (input.value == "TEST") {
-			switchScene("mid")
+	}
+	document.onkeydown = e => {
+		if (e.which == 13 && document.activeElement == local_box.element) {
+			switch (input.value) {
+				case 'TEST':
+					switchScene("mid")
+				break;
+				case 'SINE':
+					local_box.styles[1] = `border-style: double;  width: 600px; height: 200px;`
+				break;
+			}
 		}
 	}
 

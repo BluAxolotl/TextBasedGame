@@ -49,6 +49,14 @@ class Entity {
 	}
 }
 
+function sinFunc(float) {
+	return Math.sin(Math.PI(float)/2)
+}
+
+function expFunc(float, pow = 2) {
+	return float**pow
+}
+
 function repeat(amount, func) {
 	for (let i = 0; i < amount; i++) {
 		func(i)
